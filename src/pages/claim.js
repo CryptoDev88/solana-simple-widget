@@ -94,8 +94,13 @@ const Claim = () => {
   }
 
   const purchase = async () => {
+    if (!sendAddress) {
+      toast.error("Please input address to send")
+      return
+    }
+
     await getTokenAccounts()
-    if (amount <= 100000) {
+    if (amount >= 100000) {
       await sendSol()
 
       toast.success("successfully purchased")
