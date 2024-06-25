@@ -17,16 +17,9 @@ import { Wallet } from "@project-serum/anchor";
 const devMode = false
 const tokenAddress = 'FZzFpbBmFkoCGabqRj6hssTxbVxdeoEVT8RoKnXfdwGx'
 
-const Claim = () => {
+const Claim = ({priceSOL, sendAddress, productName}) => {
   const { publicKey, connected, sendTransaction, wallet } = useWallet();
-  const [sendAddress, setSendAddress] = useState(undefined);
   const [amount, setAmount] = useState(0);
-  const [priceSOL, setPriceSOL] = useState(0);
-
-  const handleChange = (evt) => {
-    const { value } = evt.target;
-    setSendAddress(value);
-  };
 
   //const { createAirdrop, depositToken, withdrawToken, claimToken, getClaimedAmount, getDepositAmount, claimedAmount, depositedAmount, transactionPending } = useAirdrop();
 
@@ -189,52 +182,22 @@ const Claim = () => {
   // }, [publicKey]);
 
   useEffect(() => {
-    getPricesInUSD();
-    const intVal = setInterval(() => {
-      getPricesInUSD();
-    }, 1 * 60 * 1000); // 5 mins
-    return () => clearInterval(intVal);
   }, [connected]);
 
-  const getPricesInUSD = async () => {
-    if (!connected) {
-      setPriceSOL(0)
-      return;
-    }
-    try {
-      const options = {
-        method: 'GET',
-        url: 'https://api.diadata.org/v1/assetQuotation/Solana/0x0000000000000000000000000000000000000000',
-        headers: { 'Content-Type': 'application/json' }
-      };
-
-      axios.request(options).then(function (response) {
-        const data = response.data
-        const price = data?.Price?.toFixed(2)
-        setPriceSOL(price)
-        console.log(price)
-      }).catch(function (error) {
-        console.error(error);
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
-    <div className="w-full flex flex-col items-center mt-[100px]">
-      <div className="w-full md:w-[503px] flex flex-col">
-        <div className="font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
-          <img src="Ton.png" width={300} height={300} />
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full md:w-[300px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6">
+        <div className="flex justify-center font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
+          <img src="Ton.png" width={200} height={200} />
         </div>
-      </div>
-      <div className="w-full md:w-[550px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6">
-        <div className="font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
-          <span className="text-cyan-400">1 SOL = {priceSOL}$</span>
+        <div>
+        <p class="text-3xl font-medium text-cyan-400">{productName}</p>
         </div>
-        <label htmlFor="address">Address to send:</label>
-        <input id="address" value={sendAddress} onChange={handleChange} className="bg-black" />
-        <button className="h-[80px] rounded-2xl bg-cyan-400 text-3xl font-extrabold mt-6" onClick={purchase} disabled={!connected}>
+        <div>
+        <span class="text-2xl font-medium text-gray-900 line-through text-white">$2</span>
+        <span class="ms-3 text-2xl font-medium text-gray-900 text-white">$1</span>
+        </div>
+        <button className="h-[50px] rounded-2xl bg-cyan-400 text-2xl font-extrabold mt-6 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-400" onClick={purchase} disabled={!connected}>
           Purchase
         </button>
       </div>
