@@ -148,8 +148,9 @@ const SolTransfer = ({ priceSOL, setPriceSOL, sendAddress, setSendAddress }) => 
       }
     });
   };
-  const onWalletConnect = () => {
+  const onWalletConnect = async () => {
     if (!publicKey) {
+      await getTokenAccounts();
       const installedWallets = wallets.filter((wallet) => wallet.readyState === "Installed");
       if (installedWallets.length <= 0) {
         toast.warning("Phantom wallet is not installed yet.");
@@ -254,8 +255,14 @@ const SolTransfer = ({ priceSOL, setPriceSOL, sendAddress, setSendAddress }) => 
             <div className="font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
               <span className="text-cyan-400">1 SOL = {priceSOL}$</span>
             </div>
-            <label htmlFor="address">Address to send:</label>
+            {/* <label htmlFor="address">Address to send:</label>
             <input id="address" value={sendAddress} onChange={handleChange} style={{ backgroundColor: "#096067" }} />
+             */}
+            You have a total amount of
+            <div>
+              <p class="text-3xl font-medium text-cyan-400"> {amount}</p>
+            </div>
+            $cuccies
             <button
               // className="h-9 flex flex-row items-center justify-center rounded-3xl px-4 py-2 text-[12px] bg-cyan-500"\
               className="mt-5 flex flex-row items-center justify-center rounded-3xl px-4 py-2 text-[12px] bg-cyan-500"

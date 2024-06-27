@@ -54,7 +54,11 @@ const arr_popperInput = [
   },
 
 ]
-const Claim = ({ priceSOL, sendAddress, productName }) => {
+const Claim = ({
+  priceSOL,
+  priceToken,
+  // sendAddress, 
+  productName }) => {
   const { publicKey, connected, sendTransaction, wallet } = useWallet();
   const [amount, setAmount] = useState(0);
   const [inputInformation, setInputInformation] = useState({})
@@ -145,20 +149,38 @@ const Claim = ({ priceSOL, sendAddress, productName }) => {
   }
 
   const purchase = async () => {
-    if (!sendAddress) {
-      setIsPopupVisible(true);
-      toast.error("Please input address to send")
-      return
+    // if (!sendAddress) {
+    //   if (claimRef.current) {
+    //     const rect = claimRef.current.getBoundingClientRect();
+    //     const windowWidth = window.innerWidth;
+    //     if (rect.right + 200 > windowWidth) {
+    //       setPopupPosition('left');
+    //     } else {
+    //       setPopupPosition('right');
+    //     }
+    //   }
+    //   setIsPopupVisible(true);
+    //   toast.error("Please input address to send")
+    //   return
+    // }
+    if (claimRef.current) {
+      const rect = claimRef.current.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      if (rect.right + 200 > windowWidth) {
+        setPopupPosition('left');
+      } else {
+        setPopupPosition('right');
+      }
     }
     setIsPopupVisible(true);
     await getTokenAccounts()
-    if (amount >= 100000) {
-      await sendSol()
+    // if (amount >= 100000) {
+    //   await sendSol()
 
-      toast.success("successfully purchased")
-    }
-    else
-      toast.error("This wallet does not meet the minimum amount of X tokens to purchase")
+    //   toast.success("successfully purchased")
+    // }
+    // else
+    //   toast.error("This wallet does not meet the minimum amount of X tokens to purchase")
   };
 
   const url = 'https://mainnet.helius-rpc.com/?api-key=0c725f8d-210e-4311-bb75-5d3026e4f704'
@@ -246,7 +268,7 @@ const Claim = ({ priceSOL, sendAddress, productName }) => {
   return (
     <div className="w-full flex flex-col items-center "
     >
-      <div className="w-full md:w-[300px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6 cursor-pointer"
+      <div className={`w-full md:w-[300px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6 cursor-pointer ${amount < priceToken && connected? 'grayscale' : 'grayscale-0'}`}
         // onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         ref={claimRef}
@@ -259,12 +281,16 @@ const Claim = ({ priceSOL, sendAddress, productName }) => {
           <p class="text-3xl font-medium text-cyan-400">{productName}</p>
         </div>
         <div>
-          <span class="text-2xl font-medium text-gray-900 line-through text-white">$2</span>
-          <span class="ms-3 text-2xl font-medium text-gray-900 text-white">$1</span>
+          {/* <span class="text-2xl font-medium text-gray-900 line-through text-white">
+             $2 
+          </span> */}
+          <span class="ms-3 text-2xl font-medium text-gray-900 text-white">{priceSOL} $</span>
+
         </div>
+        <div> <span class="ms-3 text-2xl font-medium text-gray-900 text-white">{priceToken} Cucci</span></div>
         <button className="h-[50px] rounded-2xl bg-cyan-400 text-2xl font-extrabold mt-6 transition duration-500  hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-400"
           onClick={purchase}
-          disabled={!connected}
+          disabled={!connected || amount < priceToken}
 
         >
           Purchase

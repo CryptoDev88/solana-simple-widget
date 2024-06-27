@@ -1,0 +1,53 @@
+{
+  "staticDatas" : [
+    {
+        "id": 1,
+        "priceSOL": 0.1,
+        "priceToken" : 500,
+        "productName": "Product1"
+    },
+    {
+        "id": 2,
+        "priceSOL": 1,
+        "priceToken" : 5000,
+        "productName": "Product2"
+    },
+    {
+        "id": 3,
+        "priceSOL": 0.3,
+        "priceToken" : 1500,
+        "productName": "Product3"
+    },
+    {
+        "id": 4,
+        "priceSOL": 0.4,
+        "priceToken" : 2000,
+        "productName": "Product4"
+    },
+    {
+        "id": 5,
+        "priceSOL": 0.5,
+        "priceToken" : 2500,
+        "productName": "Product5"
+    },
+    {
+        "id": 6,
+        "priceSOL": 0.6,
+        "priceToken" : 3000,
+        "productName": "Product6"
+    },
+    {
+        "id": 7,
+        "priceSOL": 0.7,
+        "priceToken" : 3500,
+        "productName": "Product7"
+    },
+    {
+        "id": 8,
+        "priceSOL": 2,
+        "priceToken" : 10000,
+        "productName": "Product8"
+    }
+  ] 
+}
+
