@@ -11,7 +11,7 @@ import Navbar from "./layouts/navbar";
 import Claim from "./pages/claim";
 import SolTransfer from "./pages/solTransfer"
 import ThemeContext from "./context/themeContext";
-
+import localData from './claimLocal.json';
 import "./App.css";
 import SOL from "./assets/img/sol.svg";
 import USDC from "./assets/img/usdc.svg";
@@ -34,17 +34,27 @@ function App() {
         <WalletConnectProvider>
           <Navbar></Navbar>
           <div className="px-5 md:px-10 lg:px-0 pt-6">
-            <SolTransfer priceSOL={priceSOL} setPriceSOL={setPriceSOL} sendAddress={sendAddress} setSendAddress={setSendAddress}/>
+            <SolTransfer priceSOL={priceSOL} setPriceSOL={setPriceSOL} sendAddress={sendAddress} setSendAddress={setSendAddress} />
           </div>
           <div className="px-5 md:px-10 lg:px-0 pt-6 md:pt-[100px] pb-[160px] grid gap-x-8 gap-y-4 grid-cols-4">
-            <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product1' />
+            {
+              localData.staticDatas.map(data => (
+                <Claim
+                  priceSOL={data.priceSOL}
+                  // sendAddress={sendAddress} 
+                  productName={data.productName}
+                  priceToken={data.priceToken}
+                />
+              ))
+            }
+            {/* <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product1' />
             <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product2' />
             <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product3' />
             <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product4' />
             <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product5' />
             <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product6' />
             <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product7' />
-            <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product8' />
+            <Claim priceSOL={priceSOL} sendAddress={sendAddress} productName='Product8' /> */}
           </div>
           <ToastContainer autoClose={3000} draggableDirection="x" toastStyle={{ backgroundColor: "#05bfc4", color: "white" }} />
         </WalletConnectProvider>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import "./pages.css";
 import axios from "axios";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -16,13 +16,75 @@ import { Wallet } from "@project-serum/anchor";
 // import { publicKey } from "@project-serum/anchor/dist/cjs/utils/index.js";
 const devMode = false
 const tokenAddress = 'FZzFpbBmFkoCGabqRj6hssTxbVxdeoEVT8RoKnXfdwGx'
+const arr_popperInput = [
+  {
+    input_name: 'price',
+    id: 'price',
+    placeholder: 'EMAIL ADDRESS'
+  },
+  {
+    input_name: 'name',
+    id: 'name',
+    placeholder: 'NAME'
+  },
+  {
+    input_name: 'street_no',
+    id: 'street_no',
+    placeholder: 'STREET NO.'
+  },
+  {
+    input_name: 'street_name',
+    id: 'street_name',
+    placeholder: 'STREET NAME'
+  },
+  {
+    input_name: 'city',
+    id: 'city',
+    placeholder: 'CITY'
+  },
+  {
+    input_name: 'state',
+    id: 'state',
+    placeholder: 'STATE'
+  },
+  {
+    input_name: 'zip',
+    id: 'zip',
+    placeholder: 'ZIP'
+  },
 
-const Claim = ({priceSOL, sendAddress, productName}) => {
+]
+const Claim = ({
+  priceSOL,
+  priceToken,
+  // sendAddress, 
+  productName }) => {
   const { publicKey, connected, sendTransaction, wallet } = useWallet();
   const [amount, setAmount] = useState(0);
+  const [inputInformation, setInputInformation] = useState({})
 
   //const { createAirdrop, depositToken, withdrawToken, claimToken, getClaimedAmount, getDepositAmount, claimedAmount, depositedAmount, transactionPending } = useAirdrop();
-
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [popupPosition, setPopupPosition] = useState('right');
+  const claimRef = useRef()
+  // const handleMouseEnter = () => {
+  //   if (claimRef.current) {
+  //     const rect = claimRef.current.getBoundingClientRect();
+  //     const windowWidth = window.innerWidth;
+  //     if (rect.right + 200 > windowWidth) {
+  //       setPopupPosition('left');
+  //     } else {
+  //       setPopupPosition('right');
+  //     }
+  //   }
+  //   setIsPopupVisible(true);
+  // };
+  const onChange = (e) => {
+    setInputInformation({ ...inputInformation, [e.target.id]: e.target.value })
+  }
+  const handleMouseLeave = () => {
+    setIsPopupVisible(false);
+  };
   async function sendTransactions(
     connection,
     wallet,
@@ -32,14 +94,14 @@ const Claim = ({priceSOL, sendAddress, productName}) => {
       transaction.recentBlockhash = (
         await connection.getLatestBlockhash()
       ).blockhash;
-      transaction.feePayer =wallet.adapter.publicKey 
+      transaction.feePayer = wallet.adapter.publicKey
       const signedTransaction = await wallet.adapter.signTransaction?.(
         transaction
       );
       const rawTransaction = signedTransaction.serialize();
 
       if (rawTransaction) {
-        const txid= await connection.sendRawTransaction(
+        const txid = await connection.sendRawTransaction(
           rawTransaction,
           {
             skipPreflight: true,
@@ -87,19 +149,38 @@ const Claim = ({priceSOL, sendAddress, productName}) => {
   }
 
   const purchase = async () => {
-    if (!sendAddress) {
-      toast.error("Please input address to send")
-      return
+    // if (!sendAddress) {
+    //   if (claimRef.current) {
+    //     const rect = claimRef.current.getBoundingClientRect();
+    //     const windowWidth = window.innerWidth;
+    //     if (rect.right + 200 > windowWidth) {
+    //       setPopupPosition('left');
+    //     } else {
+    //       setPopupPosition('right');
+    //     }
+    //   }
+    //   setIsPopupVisible(true);
+    //   toast.error("Please input address to send")
+    //   return
+    // }
+    if (claimRef.current) {
+      const rect = claimRef.current.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      if (rect.right + 200 > windowWidth) {
+        setPopupPosition('left');
+      } else {
+        setPopupPosition('right');
+      }
     }
-
+    setIsPopupVisible(true);
     await getTokenAccounts()
-    if (amount >= 100000) {
-      await sendSol()
+    // if (amount >= 100000) {
+    //   await sendSol()
 
-      toast.success("successfully purchased")
-    }
-    else
-      toast.error("This wallet does not meet the minimum amount of X tokens to purchase")
+    //   toast.success("successfully purchased")
+    // }
+    // else
+    //   toast.error("This wallet does not meet the minimum amount of X tokens to purchase")
   };
 
   const url = 'https://mainnet.helius-rpc.com/?api-key=0c725f8d-210e-4311-bb75-5d3026e4f704'
@@ -185,24 +266,93 @@ const Claim = ({priceSOL, sendAddress, productName}) => {
   }, [connected]);
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="w-full md:w-[300px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6">
-        <div className="flex justify-center font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
+    <div className="w-full flex flex-col items-center "
+    >
+      <div className={`w-full md:w-[300px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6 cursor-pointer ${amount < priceToken && connected? 'grayscale' : 'grayscale-0'}`}
+        // onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        ref={claimRef}
+      >
+        <div className="flex justify-center font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight "
+        >
           <img src="Ton.png" width={200} height={200} />
         </div>
         <div>
-        <p class="text-3xl font-medium text-cyan-400">{productName}</p>
+          <p class="text-3xl font-medium text-cyan-400">{productName}</p>
         </div>
         <div>
-        <span class="text-2xl font-medium text-gray-900 line-through text-white">$2</span>
-        <span class="ms-3 text-2xl font-medium text-gray-900 text-white">$1</span>
+          {/* <span class="text-2xl font-medium text-gray-900 line-through text-white">
+             $2 
+          </span> */}
+          <span class="ms-3 text-2xl font-medium text-gray-900 text-white">{priceSOL} $</span>
+
         </div>
-        <button className="h-[50px] rounded-2xl bg-cyan-400 text-2xl font-extrabold mt-6 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-400" onClick={purchase} disabled={!connected}>
+        <div> <span class="ms-3 text-2xl font-medium text-gray-900 text-white">{priceToken} Cucci</span></div>
+        <button className="h-[50px] rounded-2xl bg-cyan-400 text-2xl font-extrabold mt-6 transition duration-500  hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-400"
+          onClick={purchase}
+          disabled={!connected || amount < priceToken}
+
+        >
           Purchase
         </button>
+        {isPopupVisible && (
+          <div className={`border-cyan-400 absolute mt-1 w-[250px] h-[500px] p-4 bg-white border border-black-300 rounded-lg shadow-lg 
+          ${popupPosition === 'right' ? 'ml-[250px]' : 'ml-[-250px]'}
+          
+          `}>
+            <div
+              className={` transition-opacity duration-300 ease-in-out transform  absolute top-1/2 transform -translate-y-1/2 ${popupPosition === 'right' ? 'right-[245px]' : 'left-[245px]'
+                }  ${isPopupVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+            >
+              <div
+                className={`w-0 h-0 border-transparent border-solid ${popupPosition === 'right'
+                  ? 'border-r-white border-[15px]'
+                  : 'border-l-white border-[15px]'
+                  }`}
+              ></div>
+            </div>
+            <p className="text-black">SHIPPING ADDRESS INFO</p>
+            <div>
+
+              <div class="relative mt-2 rounded-md shadow-sm">
+                {
+                  arr_popperInput.length > 0 && arr_popperInput.map(element => {
+                    return (
+                      <PopperInput
+                        input_name={element["input_name"]}
+                        id={element["id"]}
+                        placeholder={element["placeholder"]}
+                        onChange={onChange}
+                      />
+
+                    )
+                  }
+                  )
+                }
+                <button className="h-[30px] w-[120px] bg-black  font-extrabold mt-6"
+                  onClick={() => console.log(inputInformation)}
+                >
+                  submit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div >
   );
 };
+const PopperInput = ({ input_name, id, placeholder, onChange }) => (
+  <div class="relative mt-2 rounded-md shadow-sm">
 
+    <input
+      type="text"
+      name={input_name}
+      id={id}
+      class="block w-full rounded-md border-0 py-1.5 pl-2 pr-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      placeholder={placeholder}
+      onChange={onChange} />
+
+  </div>
+)
 export default Claim;
