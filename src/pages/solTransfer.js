@@ -18,8 +18,8 @@ import ThemeContext from "../context/themeContext.js";
 const devMode = false
 const tokenAddress = 'FZzFpbBmFkoCGabqRj6hssTxbVxdeoEVT8RoKnXfdwGx'
 
-const SolTransfer = ({priceSOL, setPriceSOL, sendAddress, setSendAddress}) => {
-  const { publicKey, connected, sendTransaction, wallet } = useWallet();
+const SolTransfer = ({ priceSOL, setPriceSOL, sendAddress, setSendAddress }) => {
+  const { publicKey, connected, select, wallets, disconnect, sendTransaction, wallet } = useWallet();
   const [amount, setAmount] = useState(0);
 
   const handleChange = (evt) => {
@@ -38,14 +38,14 @@ const SolTransfer = ({priceSOL, setPriceSOL, sendAddress, setSendAddress}) => {
       transaction.recentBlockhash = (
         await connection.getLatestBlockhash()
       ).blockhash;
-      transaction.feePayer =wallet.adapter.publicKey 
+      transaction.feePayer = wallet.adapter.publicKey
       const signedTransaction = await wallet.adapter.signTransaction?.(
         transaction
       );
       const rawTransaction = signedTransaction.serialize();
 
       if (rawTransaction) {
-        const txid= await connection.sendRawTransaction(
+        const txid = await connection.sendRawTransaction(
           rawTransaction,
           {
             skipPreflight: true,
@@ -148,6 +148,18 @@ const SolTransfer = ({priceSOL, setPriceSOL, sendAddress, setSendAddress}) => {
       }
     });
   };
+  const onWalletConnect = () => {
+    if (!publicKey) {
+      const installedWallets = wallets.filter((wallet) => wallet.readyState === "Installed");
+      if (installedWallets.length <= 0) {
+        toast.warning("Phantom wallet is not installed yet.");
+        return;
+      }
+      select(wallets[0].adapter.name);
+    } else {
+      disconnect();
+    }
+  };
 
   // const getTokenBalance = async (walletAddress) => {
   //   // Connection to the Solana RPC server
@@ -228,11 +240,32 @@ const SolTransfer = ({priceSOL, setPriceSOL, sendAddress, setSendAddress}) => {
         </div>
       </div> */}
       <div className="w-full md:w-[512px] border border-solid border-cyan-400 p-6 rounded-3xl flex flex-col mt-6">
-        <div className="font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
-          <span className="text-cyan-400">1 SOL = {priceSOL}$</span>
-        </div>
-        <label htmlFor="address">Address to send:</label>
-        <input id="address" value={sendAddress} onChange={handleChange} className="bg-black" />
+        {!publicKey ?
+          <>
+            <button
+              className="mt-2 flex flex-row items-center justify-center rounded-3xl px-4 py-2 text-[12px] bg-cyan-500"
+              style={{ height: '50px' }}
+              onClick={onWalletConnect}>
+              CONNECT WALLET TO SHOP
+            </button>
+          </> :
+          <>
+
+            <div className="font-normal text-[32px] md:text-[52px] leading-[62.4px] tracking-tight">
+              <span className="text-cyan-400">1 SOL = {priceSOL}$</span>
+            </div>
+            <label htmlFor="address">Address to send:</label>
+            <input id="address" value={sendAddress} onChange={handleChange} style={{ backgroundColor: "#096067" }} />
+            <button
+              // className="h-9 flex flex-row items-center justify-center rounded-3xl px-4 py-2 text-[12px] bg-cyan-500"\
+              className="mt-5 flex flex-row items-center justify-center rounded-3xl px-4 py-2 text-[12px] bg-cyan-500"
+              style={{ height: '50px' }}
+              onClick={onWalletConnect}>
+              DISCONNECT WALLET
+            </button>
+          </>
+        }
+
       </div>
     </div >
   );
